@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSCI218 Group Project</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-container">
+        <h1 class="header-title">CSCI218 Group Project</h1>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <!-- Form Section -->
+    <div class="form-container">
+        <h1 style="text-align: center;">Spam Email Detection</h1>
+        <form action="/" method="post">
+            <label for="email_text">Paste Email Text:</label>
+            <br>
+            <textarea name="email_text" id="email_text" rows="20" placeholder="Paste your email text here..."></textarea>
+            <br><br>
+            <button type="submit">Detect Spam</button>
+        </form>
+    </div>
+
+    <!-- Picture Section -->
+    <div class="picture-container"> </div>
+    
+    <!-- Results Section -->
+    <div class="results-container">
+        {% set models = ['Naïve Bayes', 'LSTM', 'Random Forest'] %}
+
+        <div class="result-box-container">
+            {% for model in models %}
+                <div class="result-box">
+                    <div class="result-title">{{ model }}</div>
+
+                    {% if predictions and model in predictions %}
+                        <p class="result-text">{{ predictions[model].label }}</p>
+                        <p class="probability">{{ predictions[model].probability }}%</p>
+
+                        {% if predictions[model].probability > 0 %}
+                        <img class="spam-image" src="{{ url_for('static', filename='spam_icon.png') }}" 
+                            style="width: {{ predictions[model].probability * 1.5 }}px; height: {{ predictions[model].probability * 1.5 }}px;" 
+                            alt="Spam Indicator">
+                        {% endif %}
+                    {% else %}
+                        <p class="result-text">No result</p>
+                        <p class="probability">0%</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Final Result Box -->
+        <div class="final-box">
+            <h2>Final Decision</h2>
+            {% if model_count > 0 %}
+                <p class="final-result-text">
+                    {% if average_probability > 60 %}
+                        🚨 Spam Detected!
+                    {% else %}
+                        ✅ Not Spam
+                    {% endif %}
+                </p>
+                <p class="final-probability">Average Confidence: {{ average_probability|round(2) }}%</p>
+            {% else %}
+                <p class="final-result-text">⚠️ No valid probability values found.</p>
+                <p class="final-probability">Average Confidence: 0%</p>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>
